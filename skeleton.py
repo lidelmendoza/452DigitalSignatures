@@ -200,6 +200,64 @@ def main():
 
 		print "Signature saved to file ", sigFileName
 
+		user_input = raw_input("Would you like to encrypt your file with AES? (Y/N)\nAnswer: ")
+		if user_input.lower() == "yes" or user_input.lower() == "y":
+			file = open(inputFileName, "r")
+
+			# Check size of message to see if padding needed
+			character_count = 0
+			words_in_file = file.read()
+			for word in words_in_file:
+				for character in word:
+					character_count = character_count + 1
+			file.close()
+
+			# Add padding to message
+			sig = ",".join(str(i) for i in sigFromFile)
+			length_of_sig = len(sig)
+			total_length = character_count + length_of_sig
+			if total_length % 16 != 0:
+				padding = 16 - (total_length % 16)
+				file = open(inputFileName, "a+")
+				for i in range(0, padding - 1): # -1 for '\n'
+					file.write("0")
+				file.write("\n")
+				file.close()
+
+			# Add signature to message
+			file = open(inputFileName, "a+")
+			file.write(sig)
+			file.close()
+
+			# Find total character length in file
+			'''
+			file = open(inputFileName, "r")
+			character_count1 = 0
+			words_in_file = file.read()
+			for word in words_in_file:
+				for character in word:
+					character_count1 = character_count1 + 1
+			file.close()
+			print("Character count after sig and pad: " + str(character_count1))
+			'''
+
+			# Encrypt message
+			aes_key = raw_input("Please enter a 16-bit key: ")
+			encryption = AES.new(aes_key, AES.MODE_CBC, "abcdef1234567890")
+
+			file = open(inputFileName, "r")
+			file_to_encrypt = file.read()
+			ciphertext = encryption.encrypt(file_to_encrypt)
+			file.close()
+
+			# Write ciphertext to file
+			file = open(inputFileName, "w")
+			file.write(ciphertext)
+			file.close()
+			print(inputFileName + " has successfully been encrypted!")
+
+
+
 	# We are verifying the signature
 	elif mode == "verify":
 
@@ -209,9 +267,9 @@ def main():
 
 		sigFromFile = loadSig(sigFileName)
 		if verifyFileSig(inputFileName, key, sigFromFile) == True:
-			print("VERIFICATION VALID")
+			print("Signatures match!")
 		else:
-			print("VERIFICATION INVALID")
+			print("Signatures DO NOT match!")
 
 		pass
 	else:
