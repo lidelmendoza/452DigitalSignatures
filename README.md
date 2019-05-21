@@ -29,7 +29,7 @@ Example to sign: python skeleton.py privKey.pem signature.txt input_file.txt sig
 Example to verify: python skeleton.py pubKey.pem signature.txt input_file.txt verify
 
 # Extra Credit:
-Maybe later.
+Yes!
 
 # Special Notes:
-None.
+For the extra credit, we used Crypto's AES encryption function. We ask the user for a 16-bit key (e.g. 1234567890abcdef) in order for the function to work. We hard-coded the initialization vector and the mode (CBC), required to use the function, so the user only has to remember the key. When encrypting and decrypting, the user will be prompted for the key (SO REMEMBER THE KEY). When encrypting the message, we appended any padding needed for the AES function, the digital signature to the message, and then encrypted it. When decrypting the message, it sucessfully removes both the padding and the signature from the original message.
