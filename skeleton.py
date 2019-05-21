@@ -264,11 +264,41 @@ def main():
 		# TODO Use the verifyFileSig() function to check if the
 		# signature signature in the signature file matches the
 		# signature of the input file
+		user_input = raw_input("Was your file encrypted using AES(Y/N)?\nAnswer: ")
+		if user_input == "yes" or user_input == "y":
+			aes_key = raw_input("Please enter the 16-bit key used to encrypt message: ")
+			decryption = AES.new(aes_key, AES.MODE_CBC, "abcdef1234567890")
+
+			# Decrypt message
+			file = open(inputFileName, "r")
+			file_to_decrypt = file.read()
+			plaintext = decryption.decrypt(file_to_decrypt)
+			file.close()
+
+			# Write plaintext to file
+			file = open(inputFileName, "w")
+			file.write(plaintext)
+			file.close()
+
+			# Read lines of file into list
+			file = open(inputFileName, "r")
+			lines = file.readlines()
+			file.close()
+
+			# Remove padding and digital signature from file
+			file = open(inputFileName, "w")
+			for line in range(0, len(lines) - 2):
+				file.write(lines[line])
+			file.close()
 
 		sigFromFile = loadSig(sigFileName)
 		if verifyFileSig(inputFileName, key, sigFromFile) == True:
+			if user_input == "yes" or user_input == "y":
+				print(inputFileName + " has successfully been decrypted!")
 			print("Signatures match!")
 		else:
+			if user_input == "yes" or user_input == "y":
+				print(inputFileName + " was NOT successfully decrypted!")
 			print("Signatures DO NOT match!")
 
 		pass
